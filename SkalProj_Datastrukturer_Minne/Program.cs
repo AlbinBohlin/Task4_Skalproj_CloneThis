@@ -1,7 +1,8 @@
-﻿using System;
-
-namespace SkalProj_Datastrukturer_Minne
+﻿namespace SkalProj_Datastrukturer_Minne
 {
+    using System.Linq;
+    using System.Text;
+
     class Program
     {
         /// <summary>
@@ -111,6 +112,54 @@ namespace SkalProj_Datastrukturer_Minne
              * Example of correct: (()), {}, [({})],  List<int> list = new List<int>() { 1, 2, 3, 4 };
              * Example of incorrect: (()]), [), {[()}],  List<int> list = new List<int>() { 1, 2, 3, 4 );
              */
+
+
+            /*This is a classic use-case of recursion. Yey! Blir nästan nostalgisk.
+             Det passar utmärkt att använda en stack för att hålla reda på paranteserna men rekursion är roligare.*/
+
+            //börja med input.. vi tar exemplet från ovan och jobbar med..
+            string? input = File.ReadAllText("CheckParanthesis.txt");
+            Console.WriteLine("Checking input...");
+            //parsa ut intressant substräng, de tecken vi bryr oss om: (,[,{,),],}
+            char[] parenthesis = ['(', '[', '{', ')', ']', '}'];
+            string starters = "({[";
+            string enders = ")]}";
+
+            do
+            {
+                //kontrollera att det inte börjar med en slutande parantes
+                int start = input.IndexOfAny(parenthesis);// -1 if none
+                Console.WriteLine(input.Substring(start, input.Length - start));//blev denna pga intellisense.. 
+                if (enders.Contains(input.First()))//om fel direkt
+                {
+                    Console.WriteLine("Error: " + input.First());
+                    input = input.Substring(1);//kasta det felet
+                }
+            } while (!starters.Contains(input.First()));//repetera om inte redan rätt.
+
+
+
+
+            //nästla en metod som kör sig själv rekursivt.
+            static string Checkparenthesis(string? input, string enders, string starters, int start, StringBuilder result)
+            {
+
+
+
+
+                //sluta om vi hittar en som stänger
+                if (enders.Contains(input.First())) { result.Append(input.First());  return input.Substring(1); }
+
+                result.Append(input.First());
+
+                //annars upprepa processen
+                CheckParanthesis()
+
+            }
+
+
+
+
 
         }
 
