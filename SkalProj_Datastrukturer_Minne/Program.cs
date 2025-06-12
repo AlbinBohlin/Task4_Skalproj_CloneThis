@@ -239,9 +239,11 @@
              * Example of incorrect: (()]), [), {[()}],  List<int> list = new List<int>() { 1, 2, 3, 4 );
              */
 
+            /*En Queue hade löst detta väldigt bekvämt, men jag fick för mig att skriva en rekursiv metod istället. Blev lite bökigt, jag är rostig ännu..*/
+
             //börja med input.. vi tar exemplet från ovan och jobbar med..
-            //string? input = File.ReadAllText("CheckParanthesis.txt");
-            string input = Console.ReadLine();
+            string? input = File.ReadAllText("CheckParanthesis.txt");
+            //string input = Console.ReadLine();
 
             Console.WriteLine("input: " + input + "\nChecking input...");
             //parsa ut intressant substräng, de tecken vi bryr oss om: (,[,{,),],}
@@ -254,10 +256,44 @@
             }
             catch (Exception) { }
 
-            Console.WriteLine(Check(input, parenthesis, 0, new StringBuilder()));//Utvärdera input
+            
+            Console.WriteLine(QueueCheck(input));
+                Console.WriteLine("RecursiveCheck");
+            Console.WriteLine(CheckRecursive(input, parenthesis, 0, new StringBuilder()));//Utvärdera input
+            
 
-            //nästla en metod som kör sig själv rekursivt.
-            static string Check(string input, char[] parenthesis, int depth, StringBuilder result)
+            static string QueueCheck(string input)
+            {
+                Console.WriteLine("QueueCheck");
+                char[] parenthesis = ['(', '[', '{', ')', ']', '}'];
+                Queue<char> check = [];
+                int indexNext=0;
+                //parse input, populate queue
+
+                do                {
+                    input = input[indexNext..];//Jump to next
+                    check.Enqueue(input[0]);
+                    input = input[1..];//purge
+                    indexNext = input.IndexOfAny(parenthesis);//find next or -1 for 
+                } while (indexNext >= 0);
+
+                Stack<Char> stack = [];//För nästlade paranteser
+                foreach (char bracket in check)
+                {
+                    if (parenthesis[..3].Contains(bracket)) stack.Push(bracket);//om vi har inledande parantes, push på stack
+                    else {
+                        try
+                        {
+                            Console.WriteLine(Match(stack.Pop(), bracket));
+                        }catch(Exception) {
+                            Console.WriteLine("False" + "Stack empty");
+                        }
+                    }
+                }
+                return "";
+            }//Lade till en enkel funktion som utnytjar queue och stack..
+         
+            static string CheckRecursive(string input, char[] parenthesis, int depth, StringBuilder result)
             {
                 //sluta om vi hittar en som stänger
                 if (input.Length != 0 && parenthesis[3..].Contains(input.First()))
@@ -279,7 +315,7 @@
                             {
                                 Console.WriteLine("Error: " + result.ToString());
                                 result.Clear();
-                                return Check(input, parenthesis, 0, result);//Hittat fel, fortsätt
+                                return CheckRecursive(input, parenthesis, 0, result);//Hittat fel, fortsätt
                             }
                         }
                         Console.WriteLine("Ok: " + result.ToString());//Hittat korrekt grupp
@@ -290,9 +326,9 @@
                     {
                         Console.WriteLine("Error, Leading close: " + result.ToString()); //inledande stängade parantesfel
                         result.Clear();
-                        return Check(input, parenthesis, 0, result);//Fortsätt
+                        return CheckRecursive(input, parenthesis, 0, result);//Fortsätt
                     }
-                    return Check(input, parenthesis, depth, result);//Fortsätt efter 
+                    return CheckRecursive(input, parenthesis, depth, result);//Fortsätt efter korrekt
                 }
                 try
                 {
@@ -308,7 +344,7 @@
                 }
                 //annars upprepa processen
                 depth++;//Räkna inledande paranteser i följd.
-                return Check(input, parenthesis, depth, result);
+                return CheckRecursive(input, parenthesis, depth, result);
             }
 
 
