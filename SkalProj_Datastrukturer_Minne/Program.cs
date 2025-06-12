@@ -12,7 +12,7 @@
         /// <param name="args"></param>
         /// 
 
-
+#nullable disable
         static string ValidateInput()
         {
             string input;
@@ -20,14 +20,28 @@
             {
                 input = Console.ReadLine();
                 if (input.Length != 0) return input;
-                return "Wrong";
-
             }
-            catch (Exception) //If the input line is empty, we ask the users for some input.
+            catch (Exception)
             {
                 Console.Clear();
-                return "gg";
+
             }
+            return "A not empty string";// the switch default will handle the rest
+        }
+
+
+        static string PrintData(IEnumerable queue, string msg)
+        {
+            return $"Mesage: {msg}\n Que: {PrintValues(queue)}";
+
+            static string PrintValues(IEnumerable myCollection)
+            {
+                foreach (Object obj in myCollection)
+                    Console.Write("    {0}", obj);
+                Console.WriteLine();
+                return "";
+            }
+
         }
 
         static void Main()
@@ -107,14 +121,11 @@
                     case '0': msg = "Returning to MainMenu"; Console.WriteLine(msg); return;
                     default: msg = "Must have +,-,0 as first char in string"; break;
                 }
-                Console.WriteLine(PrintListData(theList, msg));
+                Console.WriteLine(PrintData(theList, msg));
 
             }
 
-            static string PrintListData(List<string> list, string msg)
-            {
-                return $"Mesage: {msg}\nListLength: {list.Count}\tSize: {list.Capacity}";
-            }
+
 
         }
 
@@ -135,7 +146,7 @@
             while (true)
             {
 
-                string? input = ValidateInput();
+                string input = ValidateInput();
 
                 string msg;
                 switch (input[0])
@@ -154,24 +165,9 @@
                     case '0': msg = "Returning to MainMenu"; Console.WriteLine(msg); return;
                     default: msg = "Must have +,-,0 as first char in string"; break;
                 }
-                Console.WriteLine(PrintListData(theQueue, msg));
+                Console.WriteLine(PrintData(theQueue, msg));
 
             }
-
-            static string PrintListData(Queue<string> list, string msg)
-            {
-                return $"Mesage: {msg}\n Que: {PrintValues(list)}";
-            }
-
-            static string PrintValues(IEnumerable myCollection)
-            {
-                foreach (Object obj in myCollection)
-                    Console.Write("    {0}", obj);
-                Console.WriteLine();
-                return "";
-            }
-
-
 
         }
 
@@ -193,7 +189,7 @@
             while (true)
             {
 
-                string? input = ValidateInput();
+                string input = ValidateInput();
 
                 string msg;
                 switch (input[0])
@@ -212,22 +208,13 @@
                     case '0': msg = "Returning to MainMenu"; Console.WriteLine(msg); return;
                     default: msg = "Must have +,-,0 as first char in string"; break;
                 }
-                Console.WriteLine(PrintListData(theStack, msg));
+                Console.WriteLine(PrintData(theStack, msg));
 
             }
 
-            static string PrintListData(Stack<string> stack, string msg)
-            {
-                return $"Mesage: {msg}\n Que: {PrintValues(stack)}";
-            }
 
-            static string PrintValues(IEnumerable myCollection)
-            {
-                foreach (Object obj in myCollection)
-                    Console.Write("    {0}", obj);
-                Console.WriteLine();
-                return "";
-            }
+
+
 
         }
 #nullable disable
@@ -239,56 +226,40 @@
              * Example of incorrect: (()]), [), {[()}],  List<int> list = new List<int>() { 1, 2, 3, 4 );
              */
 
-            /*En Queue hade löst detta väldigt bekvämt, men jag fick för mig att skriva en rekursiv metod istället. Blev lite bökigt, jag är rostig ännu..*/
-
-            //börja med input.. vi tar exemplet från ovan och jobbar med..
-            string? input = File.ReadAllText("CheckParanthesis.txt");
-            //string input = Console.ReadLine();
+            //string input = File.ReadAllText("CheckParanthesis.txt");
+            string input = Console.ReadLine();
 
             Console.WriteLine("input: " + input + "\nChecking input...");
-            //parsa ut intressant substräng, de tecken vi bryr oss om: (,[,{,),],}
             char[] parenthesis = ['(', '[', '{', ')', ']', '}'];
+            var brackets = input.Where(a => parenthesis.Contains(a));//Parse all brackets from string input
 
-            int start = input.IndexOfAny(parenthesis);// -1 if none
-            try
-            {
-                input = input[start..];//Empty string or no parenthesis
-            }
-            catch (Exception) {/* hanteras senare */}
+            Console.WriteLine("QueueCheck");
+            QueueCheck(brackets, parenthesis);
 
-
-            Console.WriteLine(QueueCheck(input));
+            /*Collections löste detta väldigt bekvämt, men jag fick för mig att skriva en rekursiv metod Därtill. Blev lite bökigt, jag är rostig ännu..*/
             Console.WriteLine("RecursiveCheck");
             Console.WriteLine(CheckRecursive(input, parenthesis, 0, new StringBuilder()));//Utvärdera input
 
-
-            static string QueueCheck(string input)
+            //Lade till en enkel funktion som utnytjar Linq och stack..
+            static void QueueCheck(IEnumerable<Char> input, char[] parenthesis)
             {
-                Console.WriteLine("QueueCheck");
-                char[] parenthesis = ['(', '[', '{', ')', ']', '}'];
-                Queue<char> check = [];
-                int indexNext = 0;
-                //parse input, populate queue
-
-                do
-                {
-                    input = input[indexNext..];//Jump to next
-                    check.Enqueue(input[0]);
-                    input = input[1..];//purge
-                    indexNext = input.IndexOfAny(parenthesis);//find next or -1 for 
-                } while (indexNext >= 0);
-
+                var brackets = input.Where(a => parenthesis.Contains(a));//Parse all brackets from string input
                 Stack<Char> stack = [];//För nästlade paranteser
-                foreach (char bracket in check)
+
+                foreach (char bracket in brackets)
                 {
-                    if (parenthesis[..3].Contains(bracket)) stack.Push(bracket);//om vi har inledande parantes, push på stack
-                    else { try { Console.WriteLine(Match(stack.Pop(), bracket)); } catch (Exception) { Console.WriteLine("False" + "Stack empty"); } }
-                }
-                return "";
-            }//Lade till en enkel funktion som utnytjar queue och stack..
+                    if (parenthesis[..3].Contains(bracket)) stack.Push(bracket);//om vi har inledande parantes, pusha stacken
+                    else
+                    {
+                        try { Console.WriteLine(Match(stack.Pop(), bracket)); } //matcha inledande och slutande 
+                        catch (Exception) { Console.WriteLine("False" + "Stack empty"); }//om slutande utan föregående inledande
+                    }
+                }if(stack.Count>0) Console.WriteLine("False, unclosed bracket");//om inledande utan slutande
+            }
 
             static string CheckRecursive(string input, char[] parenthesis, int depth, StringBuilder result)
             {
+
                 //sluta om vi hittar en som stänger
                 if (input.Length != 0 && parenthesis[3..].Contains(input.First()))
                 {
