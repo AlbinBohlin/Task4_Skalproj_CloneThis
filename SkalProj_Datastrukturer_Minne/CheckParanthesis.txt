@@ -1,10 +1,6 @@
-/* unclosed starting  will ruin it
+             /* unclosed starting  will ruin it
              * Use this method to check if the paranthesis in a string is Correct or incorrect.
              * Example of correct: (()), {}, [({})],  List<int> list = new List<int>() { 1, 2, 3, 4 };
-             * Example of incorrect: (()]), [), {[()}],  List<int> list = new List<int>() { 1, 2, 3, 4 );
-             
-             
-                lets add ome more
-                Single leading ( this will read until end of program or first closing..
-                
-                it will count { [ indefinitly until it encounters as many or more } () Nothing to be done about that.*/
+             * Example of incorrect: (()]), [), {[()}],  List<int> list = new List<int>() { 1, 2, 3, 4 
+             * lets add ome more  Single leading ( this will read until end of program or first closing
+             * it will count { [ indefinitly until it encounters as many or more } () Nothing to be done about that.*/

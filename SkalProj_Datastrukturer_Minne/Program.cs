@@ -117,7 +117,10 @@
 
             //börja med input.. vi tar exemplet från ovan och jobbar med..
             string? input = File.ReadAllText("CheckParanthesis.txt");
-            Console.WriteLine("Checking input...");
+
+
+
+            Console.WriteLine("input: "+input+"\nChecking input...");
             //parsa ut intressant substräng, de tecken vi bryr oss om: (,[,{,),],}
             char[] parenthesis = ['(', '[', '{', ')', ']', '}'];
            
@@ -189,9 +192,9 @@
                 
                 switch (left)
                 {
-                    case '(': return right.Equals(')') ? true : false;
-                    case '[': return right.Equals(']') ? true : false;
-                    case '{': return right.Equals('}') ? true : false;
+                    case '(': return right.Equals(')');
+                    case '[': return right.Equals(']');
+                    case '{': return right.Equals('}');
                     default: return false;
                 }
 
