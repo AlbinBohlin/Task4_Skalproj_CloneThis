@@ -114,50 +114,89 @@
              */
 
 
-            /*This is a classic use-case of recursion. Yey! Blir nästan nostalgisk.
-             Det passar utmärkt att använda en stack för att hålla reda på paranteserna men rekursion är roligare.*/
 
             //börja med input.. vi tar exemplet från ovan och jobbar med..
             string? input = File.ReadAllText("CheckParanthesis.txt");
             Console.WriteLine("Checking input...");
             //parsa ut intressant substräng, de tecken vi bryr oss om: (,[,{,),],}
             char[] parenthesis = ['(', '[', '{', ')', ']', '}'];
-            string starters = "({[";
-            string enders = ")]}";
-
-            do
-            {
-                //kontrollera att det inte börjar med en slutande parantes
-                int start = input.IndexOfAny(parenthesis);// -1 if none
-                Console.WriteLine(input.Substring(start, input.Length - start));//blev denna pga intellisense.. 
-                if (enders.Contains(input.First()))//om fel direkt
-                {
-                    Console.WriteLine("Error: " + input.First());
-                    input = input.Substring(1);//kasta det felet
-                }
-            } while (!starters.Contains(input.First()));//repetera om inte redan rätt.
+           
+            int start = input.IndexOfAny(parenthesis);// -1 if none
+            input = input[start..];
 
 
-
+            Console.WriteLine(Check(input, parenthesis, 0, new StringBuilder()));//Utvärdera input
 
             //nästla en metod som kör sig själv rekursivt.
-            static string Checkparenthesis(string? input, string enders, string starters, int start, StringBuilder result)
+            static string Check(string? input, char[] parenthesis, int depth, StringBuilder result)
             {
-
-
-
-
                 //sluta om vi hittar en som stänger
-                if (enders.Contains(input.First())) { result.Append(input.First());  return input.Substring(1); }
+                if (parenthesis[3..].Contains(input.First()))
+                {
+                    result.Append(input.First());
+                    depth--;
+                    input = input[1..];
+                    try
+                    {
+                        input = input[input.IndexOfAny(parenthesis)..];
+                    }
+                    catch (Exception) { /*Final closing parenthesis problem*/ }
+                    if (depth == 0)
+                    { //Har vi funnit korrekt sluten grupp av paranteser eller inledande stängande fel
 
+                        for (int i = 0; i < result.Length / 2; i++)
+                        {
+                            if (!Match(result[i], result[result.Length - 1 - i]))
+                            {
+                                Console.WriteLine("Error: " + result.ToString());
+                                result.Clear();
+                                return Check(input, parenthesis, 0, result);//Hittat fel, fortsätt
+                            }
+                        }
+                        Console.WriteLine("Ok: " + result.ToString());//Hittat korrekt grupp
+                        result.Clear();
+
+                    }
+                    else if (depth < 0)
+                    {
+                        Console.WriteLine("Error, Leading close: " + result.ToString()); //inledande stängade parantesfel
+                        result.Clear();
+                        return Check(input, parenthesis, 0, result);//Fortsätt
+                    }
+                    return Check(input, parenthesis, depth, result);//Fortsätt efter korrekt
+
+                }
+
+                try
+                {
                 result.Append(input.First());
-
+                input = input[1..];
+                    input = input[input.IndexOfAny(parenthesis)..];
+                }
+                catch (Exception e) { 
+                    //Antingen färdig eller en eller fler ostängda inledande paranteser.
+                    if(result.Length>1) Console.WriteLine("Error with unclosed parenthesis: "+ result.ToString());
+                    return "\n-------All done----------\n"; }
                 //annars upprepa processen
-                CheckParanthesis()
+                depth++;//Räkna inledande paranteser i följd.
+                return Check(input, parenthesis, depth, result);
+            }
+           
+
+
+            static bool Match(char left, char right)
+            {
+                
+                switch (left)
+                {
+                    case '(': return right.Equals(')') ? true : false;
+                    case '[': return right.Equals(']') ? true : false;
+                    case '{': return right.Equals('}') ? true : false;
+                    default: return false;
+                }
+
 
             }
-
-
 
 
 
