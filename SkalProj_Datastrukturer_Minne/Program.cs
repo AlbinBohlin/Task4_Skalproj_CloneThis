@@ -1,5 +1,6 @@
 ﻿namespace SkalProj_Datastrukturer_Minne
 {
+    using System.Collections;
     using System.Linq;
     using System.Text;
 
@@ -102,7 +103,7 @@
                         theList.Add(input[1..]);
                         msg = $"Added \"{input[1..]}\"";
                         break;
-                    case '-': msg = theList.Remove(input[1..]) ? $"Removed first instance of \"{input[1..]}\"" :$"Failed to remove \"{input[1..]}\""; break;
+                    case '-': msg = theList.Remove(input[1..]) ? $"Removed first instance of \"{input[1..]}\"" : $"Failed to remove \"{input[1..]}\""; break;
                     case '0': msg = "Returning to MainMenu"; Console.WriteLine(msg); return;
                     default: msg = "Must have +,-,0 as first char in string"; break;
                 }
@@ -127,6 +128,51 @@
              * Create a switch with cases to enqueue items or dequeue items
              * Make sure to look at the queue after Enqueueing and Dequeueing to see how it behaves
             */
+
+            Queue<string> theQueue = [];
+            Console.WriteLine("+... Enques string\n- Deque string\n0 Return to main");
+
+            while (true)
+            {
+
+                string? input = ValidateInput();
+
+                string msg;
+                switch (input[0])
+                {
+                    case '+':
+                        theQueue.Enqueue(input[1..]);
+                        msg = $"Added \"{input[1..]}\" to End of Queue";
+                        break;
+                    case '-':
+                        try
+                        {
+                            msg = $"Removed first in queue: \"{theQueue.Dequeue()}\"";
+                        }
+                        catch (InvalidOperationException) { msg = "Queue empty"; }
+                        break;
+                    case '0': msg = "Returning to MainMenu"; Console.WriteLine(msg); return;
+                    default: msg = "Must have +,-,0 as first char in string"; break;
+                }
+                Console.WriteLine(PrintListData(theQueue, msg));
+
+            }
+
+            static string PrintListData(Queue<string> list, string msg)
+            {
+                return $"Mesage: {msg}\n Que: {PrintValues(list)}";
+            }
+
+            static string PrintValues(IEnumerable myCollection)
+            {
+                foreach (Object obj in myCollection)
+                    Console.Write("    {0}", obj);
+                Console.WriteLine();
+                return "";
+            }
+
+
+
         }
 
         /// <summary>
