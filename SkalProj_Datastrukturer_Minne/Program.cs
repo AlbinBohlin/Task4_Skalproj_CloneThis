@@ -185,6 +185,50 @@
              * Create a switch with cases to push or pop items
              * Make sure to look at the stack after pushing and and poping to see how it behaves
             */
+
+
+            Stack<string> theStack = [];
+            Console.WriteLine("+... Push string\n- Pop string\n0 Return to main");
+
+            while (true)
+            {
+
+                string? input = ValidateInput();
+
+                string msg;
+                switch (input[0])
+                {
+                    case '+':
+                        theStack.Push(input[1..]);
+                        msg = $"Added \"{input[1..]}\" to top of stack";
+                        break;
+                    case '-':
+                        try
+                        {
+                            msg = $"Removed top of stack: \"{theStack.Pop()}\"";
+                        }
+                        catch (InvalidOperationException) { msg = "Stack empty"; }
+                        break;
+                    case '0': msg = "Returning to MainMenu"; Console.WriteLine(msg); return;
+                    default: msg = "Must have +,-,0 as first char in string"; break;
+                }
+                Console.WriteLine(PrintListData(theStack, msg));
+
+            }
+
+            static string PrintListData(Stack<string> stack, string msg)
+            {
+                return $"Mesage: {msg}\n Que: {PrintValues(stack)}";
+            }
+
+            static string PrintValues(IEnumerable myCollection)
+            {
+                foreach (Object obj in myCollection)
+                    Console.Write("    {0}", obj);
+                Console.WriteLine();
+                return "";
+            }
+
         }
 #nullable disable
         static void CheckParanthesis()
