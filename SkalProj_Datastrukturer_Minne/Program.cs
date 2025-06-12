@@ -254,23 +254,24 @@
             {
                 input = input[start..];//Empty string or no parenthesis
             }
-            catch (Exception) { }
+            catch (Exception) {/* hanteras senare */}
 
-            
+
             Console.WriteLine(QueueCheck(input));
-                Console.WriteLine("RecursiveCheck");
+            Console.WriteLine("RecursiveCheck");
             Console.WriteLine(CheckRecursive(input, parenthesis, 0, new StringBuilder()));//Utvärdera input
-            
+
 
             static string QueueCheck(string input)
             {
                 Console.WriteLine("QueueCheck");
                 char[] parenthesis = ['(', '[', '{', ')', ']', '}'];
                 Queue<char> check = [];
-                int indexNext=0;
+                int indexNext = 0;
                 //parse input, populate queue
 
-                do                {
+                do
+                {
                     input = input[indexNext..];//Jump to next
                     check.Enqueue(input[0]);
                     input = input[1..];//purge
@@ -281,18 +282,11 @@
                 foreach (char bracket in check)
                 {
                     if (parenthesis[..3].Contains(bracket)) stack.Push(bracket);//om vi har inledande parantes, push på stack
-                    else {
-                        try
-                        {
-                            Console.WriteLine(Match(stack.Pop(), bracket));
-                        }catch(Exception) {
-                            Console.WriteLine("False" + "Stack empty");
-                        }
-                    }
+                    else { try { Console.WriteLine(Match(stack.Pop(), bracket)); } catch (Exception) { Console.WriteLine("False" + "Stack empty"); } }
                 }
                 return "";
             }//Lade till en enkel funktion som utnytjar queue och stack..
-         
+
             static string CheckRecursive(string input, char[] parenthesis, int depth, StringBuilder result)
             {
                 //sluta om vi hittar en som stänger
