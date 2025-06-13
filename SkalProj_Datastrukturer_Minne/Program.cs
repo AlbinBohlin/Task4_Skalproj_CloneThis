@@ -43,7 +43,6 @@
             }
 
         }
-
         static void Main()
         {
 
@@ -87,9 +86,6 @@
             }
         }
 
-        /// <summary>
-        /// Examines the datastructure List
-        /// </summary>
         static void ExamineList()
         {
             /*
@@ -129,9 +125,6 @@
 
         }
 
-        /// <summary>
-        /// Examines the datastructure Queue
-        /// </summary>
         static void ExamineQueue()
         {
             /*
@@ -171,9 +164,6 @@
 
         }
 
-        /// <summary>
-        /// Examines the datastructure Stack
-        /// </summary>
         static void ExamineStack()
         {
             /*
@@ -227,50 +217,56 @@
              */
 
             //string input = File.ReadAllText("CheckParanthesis.txt");
-            string input = Console.ReadLine();
+            string input = ValidateInput();
 
             Console.WriteLine("input: " + input + "\nChecking input...");
             char[] parenthesis = ['(', '[', '{', ')', ']', '}'];
             var brackets = input.Where(a => parenthesis.Contains(a));//Parse all brackets from string input
 
             Console.WriteLine("QueueCheck");
-            QueueCheck(brackets, parenthesis);
+            QueueCheck(brackets);
 
-            /*Collections löste detta väldigt bekvämt, men jag fick för mig att skriva en rekursiv metod Därtill. Blev lite bökigt, jag är rostig ännu..*/
+            /*Collections + Linq löste detta väldigt bekvämt, men jag fick för mig att skriva en rekursiv metod Därtill. Blev lite bökigt, jag är rostig ännu..*/
             Console.WriteLine("RecursiveCheck");
-            Console.WriteLine(CheckRecursive(input, parenthesis, 0, new StringBuilder()));//Utvärdera input
+            Console.WriteLine(CheckRecursive(brackets, parenthesis, 0, new StringBuilder()));//Utvärdera input
+
+
+
+
 
             //Lade till en enkel funktion som utnytjar Linq och stack..
-            static void QueueCheck(IEnumerable<Char> input, char[] parenthesis)
+            static void QueueCheck(IEnumerable<Char> input )
             {
-                var brackets = input.Where(a => parenthesis.Contains(a));//Parse all brackets from string input
+                Char[] closing = [')', ']', '}'];
+                
                 Stack<Char> stack = [];//För nästlade paranteser
 
-                foreach (char bracket in brackets)
+                foreach (char bracket in input)
                 {
-                    if (parenthesis[..3].Contains(bracket)) stack.Push(bracket);//om vi har inledande parantes, pusha stacken
+                    if (closing.Contains(bracket)) stack.Push(bracket);//om vi har inledande parantes, pusha stacken
                     else
                     {
                         try { Console.WriteLine(Match(stack.Pop(), bracket)); } //matcha inledande och slutande 
-                        catch (Exception) { Console.WriteLine("False" + "Stack empty"); }//om slutande utan föregående inledande
+                        catch (Exception) { Console.WriteLine("False" + "Stack empty"); }//om slutande utan inledande
                     }
-                }if(stack.Count>0) Console.WriteLine("False, unclosed bracket");//om inledande utan slutande
+                }
+                if (stack.Count > 0) Console.WriteLine("False, unclosed bracket");//om inledande utan slutande
             }
 
-            static string CheckRecursive(string input, char[] parenthesis, int depth, StringBuilder result)
+
+
+
+
+            static string CheckRecursive(IEnumerable<Char> input, char[] parenthesis, int depth, StringBuilder result)
             {
 
                 //sluta om vi hittar en som stänger
-                if (input.Length != 0 && parenthesis[3..].Contains(input.First()))
+                if ( parenthesis[3..].Contains(input.First()))
                 {
                     result.Append(input.First());
+                    char[] inp = input.ToArray()[1..];
                     depth--;
-                    input = input[1..];
-                    try
-                    {
-                        input = input[input.IndexOfAny(parenthesis)..];
-                    }
-                    catch (Exception) { /*Final closing parenthesis problem*/ }
+
                     if (depth == 0)
                     { //Har vi funnit korrekt sluten grupp av paranteser eller inledande stängande fel
 
@@ -280,7 +276,7 @@
                             {
                                 Console.WriteLine("Error: " + result.ToString());
                                 result.Clear();
-                                return CheckRecursive(input, parenthesis, 0, result);//Hittat fel, fortsätt
+                                return CheckRecursive(inp, parenthesis, 0, result);//Hittat fel, fortsätt
                             }
                         }
                         Console.WriteLine("Ok: " + result.ToString());//Hittat korrekt grupp
@@ -291,15 +287,15 @@
                     {
                         Console.WriteLine("Error, Leading close: " + result.ToString()); //inledande stängade parantesfel
                         result.Clear();
-                        return CheckRecursive(input, parenthesis, 0, result);//Fortsätt
+                        return CheckRecursive(inp, parenthesis, 0, result);//Fortsätt
                     }
-                    return CheckRecursive(input, parenthesis, depth, result);//Fortsätt efter korrekt
+                    return CheckRecursive(inp, parenthesis, depth, result);//Fortsätt efter korrekt
                 }
                 try
                 {
                     result.Append(input.First());
-                    input = input[1..];
-                    input = input[input.IndexOfAny(parenthesis)..];
+                    Char[] inp = input.ToArray()[1..];
+                    
                 }
                 catch (Exception e)
                 {
@@ -309,13 +305,14 @@
                 }
                 //annars upprepa processen
                 depth++;//Räkna inledande paranteser i följd.
-                return CheckRecursive(input, parenthesis, depth, result);
+                return CheckRecursive(input.ToArray(), parenthesis, depth, result);
             }
 
 
 
             static bool Match(char left, char right)
             {
+
                 switch (left)
                 {
                     case '(': return right.Equals(')');
