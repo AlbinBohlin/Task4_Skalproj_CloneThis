@@ -225,14 +225,12 @@
             QueueCheck(brackets);//Matcha
 
             static void QueueCheck(IEnumerable<Char> input )
-            {
-                Char[] opening = ['(', '[', '{'];
-                
+            {                
                 Stack<Char> stack = [];//För nästlade paranteser
 
                 foreach (char bracket in input)
                 {
-                    if (opening.Contains(bracket)) stack.Push(bracket);//om vi har inledande parantes, pusha stacken
+                    if (((Char[])['(', '[', '{']).Contains(bracket)) stack.Push(bracket);//om vi har inledande parantes, pusha stacken
                     else
                     {
                         try { Console.WriteLine(Match(stack.Pop(), bracket)); } //matcha inledande och slutande  True:False 
