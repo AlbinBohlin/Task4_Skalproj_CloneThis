@@ -218,101 +218,33 @@
 
             //string input = File.ReadAllText("CheckParanthesis.txt");
             string input = ValidateInput();
-
-            Console.WriteLine("input: " + input + "\nChecking input...");
+            
             char[] parenthesis = ['(', '[', '{', ')', ']', '}'];
             var brackets = input.Where(a => parenthesis.Contains(a));//Parse all brackets from string input
 
-            Console.WriteLine("QueueCheck");
-            QueueCheck(brackets);
+            QueueCheck(brackets);//Matcha
 
-            /*Collections + Linq löste detta väldigt bekvämt, men jag fick för mig att skriva en rekursiv metod Därtill. Blev lite bökigt, jag är rostig ännu..*/
-            Console.WriteLine("RecursiveCheck");
-            Console.WriteLine(CheckRecursive(brackets, parenthesis, 0, new StringBuilder()));//Utvärdera input
-
-
-
-
-
-            //Lade till en enkel funktion som utnytjar Linq och stack..
             static void QueueCheck(IEnumerable<Char> input )
             {
-                Char[] closing = [')', ']', '}'];
+                Char[] opening = ['(', '[', '{'];
                 
                 Stack<Char> stack = [];//För nästlade paranteser
 
                 foreach (char bracket in input)
                 {
-                    if (closing.Contains(bracket)) stack.Push(bracket);//om vi har inledande parantes, pusha stacken
+                    if (opening.Contains(bracket)) stack.Push(bracket);//om vi har inledande parantes, pusha stacken
                     else
                     {
-                        try { Console.WriteLine(Match(stack.Pop(), bracket)); } //matcha inledande och slutande 
+                        try { Console.WriteLine(Match(stack.Pop(), bracket)); } //matcha inledande och slutande  True:False 
                         catch (Exception) { Console.WriteLine("False" + "Stack empty"); }//om slutande utan inledande
                     }
                 }
                 if (stack.Count > 0) Console.WriteLine("False, unclosed bracket");//om inledande utan slutande
+                Console.WriteLine("");
             }
-
-
-
-
-
-            static string CheckRecursive(IEnumerable<Char> input, char[] parenthesis, int depth, StringBuilder result)
-            {
-
-                //sluta om vi hittar en som stänger
-                if ( parenthesis[3..].Contains(input.First()))
-                {
-                    result.Append(input.First());
-                    char[] inp = input.ToArray()[1..];
-                    depth--;
-
-                    if (depth == 0)
-                    { //Har vi funnit korrekt sluten grupp av paranteser eller inledande stängande fel
-
-                        for (int i = 0; i < result.Length / 2; i++)
-                        {
-                            if (!Match(result[i], result[result.Length - 1 - i]))
-                            {
-                                Console.WriteLine("Error: " + result.ToString());
-                                result.Clear();
-                                return CheckRecursive(inp, parenthesis, 0, result);//Hittat fel, fortsätt
-                            }
-                        }
-                        Console.WriteLine("Ok: " + result.ToString());//Hittat korrekt grupp
-                        result.Clear();
-
-                    }
-                    else if (depth < 0)
-                    {
-                        Console.WriteLine("Error, Leading close: " + result.ToString()); //inledande stängade parantesfel
-                        result.Clear();
-                        return CheckRecursive(inp, parenthesis, 0, result);//Fortsätt
-                    }
-                    return CheckRecursive(inp, parenthesis, depth, result);//Fortsätt efter korrekt
-                }
-                try
-                {
-                    result.Append(input.First());
-                    Char[] inp = input.ToArray()[1..];
-                    
-                }
-                catch (Exception e)
-                {
-                    //Antingen färdig eller en eller fler ostängda inledande paranteser.
-                    if (result.Length > 1) Console.WriteLine("Error with unclosed parenthesis: " + result.ToString());
-                    return "\n-------All done----------\n";
-                }
-                //annars upprepa processen
-                depth++;//Räkna inledande paranteser i följd.
-                return CheckRecursive(input.ToArray(), parenthesis, depth, result);
-            }
-
-
 
             static bool Match(char left, char right)
             {
-
                 switch (left)
                 {
                     case '(': return right.Equals(')');
